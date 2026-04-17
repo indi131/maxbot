@@ -19,4 +19,11 @@ interface NotificationRepositoryInterface
     public function countBySecretKey(string $secretKey): int;
 
     public function deleteBySecretKey(string $secretKey): void;
+
+    /**
+     * @return list<array{id:int,secret_key:string,content:string,created_at:string,user_id:int,first_name:string,username:string}>
+     */
+    public function listAll(int $limit, int $offset, ?string $secretKey = null): array;
+
+    public function countAll(?string $secretKey = null): int;
 }

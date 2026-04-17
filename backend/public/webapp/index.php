@@ -33,20 +33,45 @@ ob_start();
     <script src="https://dev.max.ru/max-web-app.js"></script>
 </head>
 <body>
-<div class="header"><h1>Последние заявки</h1></div>
+<div class="header">
+    <div class="header-inner">
+        <img class="logo" src="../assets/logo.png" alt="">
+        <h1>Последние заявки</h1>
+    </div>
+</div>
 <div class="wrapper">
 <?php if ($userId <= 0): ?>
     <p class="empty" id="loading-text">Загрузка профиля в MAX...</p>
     <script>
         (function () {
+            function readUserFromHash() {
+                try {
+                    var hash = window.location.hash || '';
+                    if (hash.indexOf('WebAppData=') === -1) return null;
+                    var params = new URLSearchParams(hash.substring(1));
+                    var rawData = params.get('WebAppData');
+                    if (!rawData) return null;
+                    var nested = new URLSearchParams(decodeURIComponent(rawData));
+                    var userRaw = nested.get('user');
+                    if (!userRaw) return null;
+                    var userObj = JSON.parse(userRaw);
+                    return userObj && userObj.id ? userObj : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
             try {
                 var user = window.WebApp && window.WebApp.initDataUnsafe && window.WebApp.initDataUnsafe.user;
+                if (!user || !user.id) {
+                    user = readUserFromHash();
+                }
                 if (user && user.id) {
                     window.location.replace('index.php?user_id=' + encodeURIComponent(String(user.id)));
                     return;
                 }
             } catch (e) {}
-            document.getElementById('loading-text').textContent = 'Не удалось получить user_id из MAX.';
+            document.getElementById('loading-text').textContent = 'Не удалось получить user_id из MAX. Откройте заявку через кнопку в чате.';
         })();
     </script>
 <?php elseif ($rows === []): ?>

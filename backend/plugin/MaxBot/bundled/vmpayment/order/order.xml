@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension version="1.0" type="plugin" group="vmpayment" method="upgrade">
+    <name>Max Заказы Virtuemart</name>
+    <creationDate>Апрель 17 2021</creationDate>
+    <author>Alexander Dolzhenko</author>
+    <authorUrl></authorUrl>
+    <copyright>Copyright (C) 2004 - 2021 Virtuemart Team. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <version>3.8.9</version>
+    <description>Данные о заказе virtuemart в Max</description>
+    <files>
+        <filename plugin="order">order.php</filename>
+        <filename>index.html</filename>
+    </files>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field
+                    name="enabled_fields"
+                    type="checkboxes"
+                    label="Поля в сообщении"
+                    description="Выберите, какие поля отправлять в MAX"
+                    default="order_number,order_created,order_name,phone_1,delivery_time,address_1,ulica,podyezd,kvartira,items,total">
+                    <option value="order_number">Номер заказа</option>
+                    <option value="order_created">Дата и время заказа</option>
+                    <option value="order_name">Имя</option>
+                    <option value="phone_1">Телефон</option>
+                    <option value="delivery_time">Время доставки</option>
+                    <option value="address_1">Город</option>
+                    <option value="ulica">Улица</option>
+                    <option value="podyezd">Подъезд</option>
+                    <option value="kvartira">Квартира</option>
+                    <option value="email">Email</option>
+                    <option value="customer_note">Комментарий</option>
+                    <option value="coupon_code">Купон</option>
+                    <option value="items">Товары</option>
+                    <option value="total">Итого</option>
+                </field>
+            </fieldset>
+        </fields>
+    </config>
+    <state>published</state>
+</extension>

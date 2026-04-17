@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="3.0" group="system" method="upgrade">
+    <name>Max Оповещения</name>
+    <author>Alexandr Dolzhenko</author>
+    <creationDate>2024-05-29</creationDate>
+    <version>1.0.0</version>
+    <description>Все оповещения в MAX</description>
+    <files>
+        <filename plugin="MaxBot">MaxBot.php</filename>
+        <filename>index.html</filename>
+        <folder>sql</folder>
+        <folder>Mail</folder>
+        <folder>bundled</folder>
+    </files>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="password" type="text" label="Пароль" description="Enter your password"/>
+                <field name="email" type="text" label="Email" description="Enter your email"/>
+                <field name="server" type="text" label="Server" description="Enter your server" default="https://max.unicode24bot.ru/notify.php"/>
+            </fieldset>
+        </fields>
+    </config>
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+        </sql>
+    </install>
+    <scriptfile>script.php</scriptfile>
+</extension>

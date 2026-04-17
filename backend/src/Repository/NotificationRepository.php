@@ -77,6 +77,56 @@ final class NotificationRepository implements NotificationRepositoryInterface
         $stmt->execute([$secretKey]);
     }
 
+    public function listAll(int $limit, int $offset, ?string $secretKey = null): array
+    {
+        $sql = 'SELECT n.id, n.secret_key, n.content, n.created_at,
+                       COALESCE(u.user_id, 0) AS user_id,
+                       COALESCE(u.first_name, "") AS first_name,
+                       COALESCE(u.username, "") AS username
+                FROM notifications n
+                LEFT JOIN users u ON u.secret_key = n.secret_key';
+        if ($secretKey !== null && $secretKey !== '') {
+            $sql .= ' WHERE n.secret_key = ?';
+        }
+        $sql .= ' ORDER BY n.id DESC LIMIT ? OFFSET ?';
+
+        $stmt = $this->pdo->prepare($sql);
+        $i = 1;
+        if ($secretKey !== null && $secretKey !== '') {
+            $stmt->bindValue($i++, $secretKey);
+        }
+        $stmt->bindValue($i++, $limit, PDO::PARAM_INT);
+        $stmt->bindValue($i, $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $out = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $norm = $this->normalizeRow($row);
+            $norm['user_id'] = (int) ($row['user_id'] ?? 0);
+            $norm['first_name'] = (string) ($row['first_name'] ?? '');
+            $norm['username'] = (string) ($row['username'] ?? '');
+            $out[] = $norm;
+        }
+
+        return $out;
+    }
+
+    public function countAll(?string $secretKey = null): int
+    {
+        if ($secretKey === null || $secretKey === '') {
+            return (int) $this->pdo->query('SELECT COUNT(*) FROM notifications')->fetchColumn();
+        }
+
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM notifications WHERE secret_key = ?');
+        $stmt->execute([$secretKey]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
     /**
      * @param array<string, mixed> $row
      * @return array{id:int,secret_key:string,content:string,created_at:string}

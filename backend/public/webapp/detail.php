@@ -42,15 +42,18 @@ ob_start();
     <script src="https://dev.max.ru/max-web-app.js"></script>
 </head>
 <body>
-<div class="header"><h1>Заявка #<?= (int) $row['id'] ?></h1></div>
+<div class="header">
+    <div class="header-inner">
+        <img class="logo" src="../assets/logo.png" alt="">
+        <h1>Заявка #<?= (int) $row['id'] ?></h1>
+    </div>
+</div>
 <div class="wrapper">
     <div class="item single">
         <div class="date"><?= $esc((string) $row['created_at']) ?></div>
         <div class="content"><?= $bodyHtml ?></div>
     </div>
-    <?php /*
     <p class="back"><?php if ($userIdBack > 0): ?><a href="index.php?user_id=<?= $userIdBack ?>">К списку</a><?php else: ?><a href="#" onclick="history.back();return false;">Назад</a><?php endif; ?></p>
-    */ ?>
 </div>
 </body>
 </html>
