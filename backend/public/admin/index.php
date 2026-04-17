@@ -17,8 +17,24 @@ if (isset($_GET['logout'])) {
     Response::redirect('login.php');
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-    $deleteId = (int) $_POST['delete_id'];
+$scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = isset($_SERVER['HTTP_HOST']) ? (string) $_SERVER['HTTP_HOST'] : '';
+$defaultBackendUrl = $host !== '' ? ($scheme . '://' . $host) : '';
+$backendUrl = isset($_POST['backend_url']) ? (string) $_POST['backend_url'] : $defaultBackendUrl;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'set_webhook') {
+    try {
+        $ok = $app->adminService->configureWebhook($backendUrl, $app->config->require('MAX_WEBHOOK_SECRET'));
+        $flash = $ok
+            ? 'Webhook успешно настроен на ' . rtrim($backendUrl, '/') . '/webhook.php'
+            : 'MAX API вернул отрицательный ответ при настройке webhook';
+    } catch (\Throwable $e) {
+        $flash = 'Ошибка настройки webhook: ' . $e->getMessage();
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_client') {
+    $deleteId = isset($_POST['delete_id']) ? (int) $_POST['delete_id'] : 0;
     if ($deleteId > 0) {
         try {
             $app->adminService->deleteClient($deleteId);
@@ -55,6 +71,19 @@ $esc = static fn (string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SU
     <p class="flash"><?= $esc($flash) ?></p>
 <?php endif; ?>
 
+<div class="login-box" style="margin:1rem 1rem 0; max-width:none;">
+    <h2 style="margin-top:0; font-size:1rem;">Webhook бота</h2>
+    <form method="post" action="" style="display:flex; gap:0.5rem; align-items:end; flex-wrap:wrap;">
+        <input type="hidden" name="action" value="set_webhook">
+        <label style="flex:1; min-width:260px; margin:0;">
+            URL бэкенда
+            <input type="text" name="backend_url" value="<?= $esc($backendUrl) ?>" placeholder="https://max.unicode24bot.ru" required>
+        </label>
+        <button type="submit" style="width:auto; padding:0.55rem 0.9rem;">Сохранить в боте</button>
+    </form>
+    <p style="margin:0.5rem 0 0; color:#5c6570; font-size:0.9rem;">Будет установлен webhook: <code><?= $esc(rtrim($backendUrl, '/')) ?>/webhook.php</code></p>
+</div>
+
 <main class="table-wrap">
     <table>
         <thead>
@@ -83,6 +112,7 @@ $esc = static fn (string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SU
                 <td><?= $esc((string) $row['last_activity']) ?></td>
                 <td>
                     <form method="post" onsubmit="return confirm('Удалить клиента?');">
+                        <input type="hidden" name="action" value="delete_client">
                         <input type="hidden" name="delete_id" value="<?= (int) $row['id'] ?>">
                         <button type="submit" class="btn-danger">Удалить</button>
                     </form>

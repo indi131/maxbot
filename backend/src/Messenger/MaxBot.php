@@ -8,12 +8,20 @@ use App\Contracts\MessengerInterface;
 
 final class MaxBot implements MessengerInterface
 {
-    private const BASE_URL = 'https://platform-api.max.ru';
+    /** @var string */
+    private $accessToken;
 
-    public function __construct(
-        private readonly string $accessToken,
-        private readonly string $webappBaseUrl,
-    ) {
+    /** @var string */
+    private $webappBaseUrl;
+
+    /** @var string */
+    private $apiBaseUrl;
+
+    public function __construct(string $accessToken, string $webappBaseUrl, string $apiBaseUrl)
+    {
+        $this->accessToken = $accessToken;
+        $this->webappBaseUrl = $webappBaseUrl;
+        $this->apiBaseUrl = rtrim($apiBaseUrl, '/');
     }
 
     public function sendMessage(int $userId, string $text, array $buttons = []): void
@@ -51,18 +59,19 @@ final class MaxBot implements MessengerInterface
     }
 
     /**
+     * @param array<string, mixed> $body
      * @return array<string, mixed>
      */
     private function request(string $method, string $path, array $body = []): array
     {
-        $url = self::BASE_URL . $path;
+        $url = $this->apiBaseUrl . $path;
         $ch = curl_init($url);
         if ($ch === false) {
             throw new \RuntimeException('curl_init failed');
         }
 
         $headers = [
-            'Authorization: ' . $this->normalizeAuthHeader($this->accessToken),
+            'Authorization: ' . $this->authorizationToken(),
             'Content-Type: application/json',
         ];
 
@@ -109,13 +118,15 @@ final class MaxBot implements MessengerInterface
         return $decoded;
     }
 
-    private function normalizeAuthHeader(string $token): string
+    /** Токен для заголовка Authorization по документации MAX (без префикса Bearer). */
+    private function authorizationToken(): string
     {
-        if (stripos($token, 'Bearer ') === 0) {
-            return $token;
+        $t = trim($this->accessToken);
+        if (stripos($t, 'Bearer ') === 0) {
+            return trim(substr($t, 7));
         }
 
-        return 'Bearer ' . $token;
+        return $t;
     }
 
     public function getWebappBaseUrl(): string

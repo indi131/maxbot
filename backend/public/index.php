@@ -7,32 +7,84 @@ declare(strict_types=1);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MAX Bot Backend</title>
-    <link rel="stylesheet" href="assets/app.css">
+    <title>MAX | Заглушка</title>
     <style>
-        .box { max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
-        .links { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
-        .links a { color: var(--accent); text-decoration: none; }
-        .links a:hover { text-decoration: underline; }
-        .warn { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 0.9rem; }
-        code { font-size: 0.85rem; }
+        :root {
+            color-scheme: dark;
+            --bg: #06080f;
+            --panel: rgba(16, 20, 33, 0.75);
+            --border: rgba(99, 115, 255, 0.35);
+            --text: #f2f5ff;
+            --muted: #8f9cc6;
+            --accent: #7b8cff;
+            --accent-2: #35d7ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+            background:
+                radial-gradient(1200px 700px at 10% -10%, rgba(123, 140, 255, 0.25), transparent 55%),
+                radial-gradient(900px 500px at 100% 100%, rgba(53, 215, 255, 0.2), transparent 60%),
+                var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+
+        .card {
+            width: min(560px, 100%);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            border-radius: 24px;
+            padding: 34px 28px;
+            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(8px);
+            text-align: center;
+        }
+
+        .logo img {
+            max-width: 200px;
+            max-width: 0px auto;
+        }
+
+        .brand {
+            margin: 0;
+            font-size: clamp(32px, 8vw, 46px);
+            line-height: 1;
+            letter-spacing: 0.14em;
+            font-weight: 800;
+        }
+
+        .text {
+            margin: 14px 0 0;
+            font-size: clamp(16px, 3.8vw, 20px);
+            font-weight: 500;
+            color: var(--muted);
+            text-transform: lowercase;
+            letter-spacing: 0.08em;
+        }
+
+        .line {
+            width: 120px;
+            height: 2px;
+            margin: 20px auto 0;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
-<div class="header"><h1>MAX Bot Backend</h1></div>
-<div class="box">
-    <p>Сервис приёма заявок и уведомлений в MAX. Ниже — прямые ссылки на скрипты (относительно корня сайта).</p>
-    <div class="links">
-        <a href="admin/login.php">Админ-панель (вход)</a>
-        <a href="notify.php">Приём заявки (POST JSON)</a>
-        <a href="webhook.php">Webhook для MAX</a>
-        <a href="webapp/index.php">Webapp (нужен <code>?user_id=…</code>)</a>
+<main class="card" role="main" aria-label="MAX заглушка">
+<div class="logo" aria-hidden="true">
+    <img src="/assets/logo.png">
     </div>
-    <div class="warn">
-        <strong>Важно для Apache:</strong> корень сайта (DocumentRoot) должен указывать на каталог <code>public</code> внутри проекта,
-        а не на родительскую папку. Иначе пути вида <code>/admin</code> не найдут файлы — используйте
-        <code>/admin/</code> или <code>/admin/login.php</code>. В корне лежит этот <code>index.php</code>, чтобы не было ошибки 403 на <code>/</code>.
-    </div>
-</div>
+    <h1 class="brand">MAX БОТ</h1>
+    <div class="line" aria-hidden="true"></div>
+</main>
 </body>
 </html>

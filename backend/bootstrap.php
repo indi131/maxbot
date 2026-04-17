@@ -22,7 +22,8 @@ $userRepo = new UserRepository($pdo);
 $notifRepo = new NotificationRepository($pdo);
 $messenger = new MaxBot(
     $config->require('MAX_BOT_TOKEN'),
-    $config->require('WEBAPP_URL')
+    $config->require('WEBAPP_URL'),
+    $config->get('MAX_API_BASE_URL')
 );
 
 $notificationService = new NotificationService($userRepo, $notifRepo, $messenger, $config);

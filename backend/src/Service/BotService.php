@@ -9,10 +9,16 @@ use App\Contracts\UserRepositoryInterface;
 
 final class BotService
 {
-    public function __construct(
-        private readonly UserRepositoryInterface $users,
-        private readonly MessengerInterface $messenger,
-    ) {
+    /** @var UserRepositoryInterface */
+    private $users;
+
+    /** @var MessengerInterface */
+    private $messenger;
+
+    public function __construct(UserRepositoryInterface $users, MessengerInterface $messenger)
+    {
+        $this->users = $users;
+        $this->messenger = $messenger;
     }
 
     /**
@@ -24,11 +30,16 @@ final class BotService
             ? $update['update_type']
             : '';
 
-        match ($type) {
-            'bot_started' => $this->onBotStarted($update),
-            'message_created' => $this->onMessageCreated($update),
-            default => null,
-        };
+        switch ($type) {
+            case 'bot_started':
+                $this->onBotStarted($update);
+                break;
+            case 'message_created':
+                $this->onMessageCreated($update);
+                break;
+            default:
+                break;
+        }
     }
 
     /**

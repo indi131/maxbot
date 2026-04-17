@@ -9,8 +9,12 @@ use PDO;
 
 final class NotificationRepository implements NotificationRepositoryInterface
 {
-    public function __construct(private readonly PDO $pdo)
+    /** @var PDO */
+    private $pdo;
+
+    public function __construct(PDO $pdo)
     {
+        $this->pdo = $pdo;
     }
 
     public function create(string $secretKey, string $content): int

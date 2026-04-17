@@ -10,8 +10,12 @@ final class AdminAuth
 {
     private const SESSION_KEY = 'max_backend_admin_id';
 
-    public function __construct(private readonly PDO $pdo)
+    /** @var PDO */
+    private $pdo;
+
+    public function __construct(PDO $pdo)
     {
+        $this->pdo = $pdo;
     }
 
     public function startSession(): void

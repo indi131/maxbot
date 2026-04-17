@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\MaxWebhookSecret;
 use App\Contracts\MessengerInterface;
 use App\Contracts\NotificationRepositoryInterface;
 use App\Contracts\UserRepositoryInterface;
@@ -12,11 +13,23 @@ final class AdminService
 {
     private const PER_PAGE = 20;
 
+    /** @var UserRepositoryInterface */
+    private $users;
+
+    /** @var NotificationRepositoryInterface */
+    private $notifications;
+
+    /** @var MessengerInterface */
+    private $messenger;
+
     public function __construct(
-        private readonly UserRepositoryInterface $users,
-        private readonly NotificationRepositoryInterface $notifications,
-        private readonly MessengerInterface $messenger,
+        UserRepositoryInterface $users,
+        NotificationRepositoryInterface $notifications,
+        MessengerInterface $messenger
     ) {
+        $this->users = $users;
+        $this->notifications = $notifications;
+        $this->messenger = $messenger;
     }
 
     /**
@@ -60,8 +73,38 @@ final class AdminService
                 $userId,
                 'Ваша регистрация в сервисе уведомлений удалена администратором.'
             );
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
             // игнорируем ошибку доставки — запись уже удалена
         }
+    }
+
+    public function configureWebhook(string $backendBaseUrl, string $secret): bool
+    {
+        $base = trim($backendBaseUrl);
+        if ($base === '') {
+            throw new \InvalidArgumentException('Укажите URL бэкенда');
+        }
+
+        if (! preg_match('#^https?://#i', $base)) {
+            $base = 'https://' . $base;
+        }
+
+        $parts = parse_url($base);
+        if (! is_array($parts) || empty($parts['host'])) {
+            throw new \InvalidArgumentException('Некорректный URL бэкенда');
+        }
+
+        $scheme = isset($parts['scheme']) ? strtolower((string) $parts['scheme']) : 'https';
+        if ($scheme !== 'https') {
+            throw new \InvalidArgumentException('Webhook должен быть на https');
+        }
+
+        $host = (string) $parts['host'];
+        $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+        $path = isset($parts['path']) ? rtrim((string) $parts['path'], '/') : '';
+
+        $webhookUrl = $scheme . '://' . $host . $port . $path . '/webhook.php';
+
+        return $this->messenger->setWebhook($webhookUrl, MaxWebhookSecret::forMaxApi($secret));
     }
 }

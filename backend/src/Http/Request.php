@@ -7,14 +7,22 @@ namespace App\Http;
 final class Request
 {
     /** @var array<string, mixed>|null */
-    private static ?array $cachedJson = null;
+    private static $cachedJson = null;
 
-    public function get(string $key, mixed $default = null): mixed
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get(string $key, $default = null)
     {
         return $_GET[$key] ?? $default;
     }
 
-    public function post(string $key, mixed $default = null): mixed
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
+    public function post(string $key, $default = null)
     {
         return $_POST[$key] ?? $default;
     }
