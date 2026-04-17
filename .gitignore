@@ -1,2 +1,5 @@
 .cursor/
 reference/
+.env
+backend/vendor/
+backend/composer.zip

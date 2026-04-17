@@ -1,0 +1,22 @@
+# Положите этот файл в корень проекта (рядом с bootstrap.php), если DocumentRoot
+# указывает на эту папку, а не на public/. Запросы внутренне обрабатываются из public/.
+
+<Files ".env">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</Files>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Уже внутри public/ — не трогаем (на случай прямого захода)
+    RewriteRule ^public/ - [L]
+    # Корень сайта
+    RewriteRule ^$ public/ [L]
+    # Всё остальное — в public/
+    RewriteRule ^((?!public/).*)$ public/$1 [L]
+</IfModule>

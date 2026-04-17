@@ -1,0 +1,7 @@
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Без завершающего слэша Apache часто отдаёт 404 для каталога
+    RewriteRule ^admin$ admin/ [L,R=301]
+</IfModule>
